@@ -1,0 +1,65 @@
+package com.example.api.core;
+
+import com.example.api.config.ApiConfig;
+import com.example.api.config.ConfigLoader;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.config.SSLConfig;
+import io.restassured.filter.log.ErrorLoggingFilter;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.ResponseSpecification;
+
+import java.io.FileInputStream;
+import java.security.KeyStore;
+
+import static io.restassured.RestAssured.config;
+
+public class SpecificationFactory {
+
+    private static final ApiConfig apiConfig = ConfigLoader.getConfig();
+
+    private static SSLConfig buildSSLConfig() {
+        try {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            try (FileInputStream keyStoreStream = new FileInputStream(apiConfig.getKeystorePath())) {
+                keyStore.load(keyStoreStream, apiConfig.getKeystorePassword().toCharArray());
+            }
+
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            try (FileInputStream trustStoreStream = new FileInputStream(apiConfig.getTruststorePath())) {
+                trustStore.load(trustStoreStream, apiConfig.getTruststorePassword().toCharArray());
+            }
+
+            return new SSLConfig()
+                    .keyStore(keyStore, apiConfig.getKeystorePassword())
+                    .trustStore(trustStore);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao configurar SSL (keystore/truststore)", e);
+        }
+    }
+
+    public static RequestSpecification requestSpec() {
+        RestAssuredConfig raConfig = config().sslConfig(buildSSLConfig());
+
+        return new RequestSpecBuilder()
+                .setBaseUri(apiConfig.getBaseUri())
+                .setContentType(ContentType.JSON)
+                .addHeader("x-cert", apiConfig.getXCert())
+                .setConfig(raConfig)
+                .addFilter(new RequestLoggingFilter())
+                .addFilter(new ResponseLoggingFilter())
+                .addFilter(new ErrorLoggingFilter())
+                .build();
+    }
+
+    public static ResponseSpecification responseSpec() {
+        return new ResponseSpecBuilder()
+                .expectContentType(ContentType.JSON)
+                .build();
+    }
+}
