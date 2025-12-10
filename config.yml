@@ -1,0 +1,25 @@
+environment: dev
+
+dev:
+  baseUri: "https://dev.api.bacen.gov.br"
+  xCert: "dev-cert-value"
+  keystorePath: "src/test/resources/certs/dev-keystore.jks"
+  keystorePassword: "changeit"
+  truststorePath: "src/test/resources/certs/dev-truststore.jks"
+  truststorePassword: "changeit"
+  basicAuth:
+    username: "devUser"
+    password: "devPass"
+  bearerToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9-dev"
+
+qa:
+  baseUri: "https://qa.api.bacen.gov.br"
+  xCert: "qa-cert-value"
+  keystorePath: "src/test/resources/certs/qa-keystore.jks"
+  keystorePassword: "changeit"
+  truststorePath: "src/test/resources/certs/qa-truststore.jks"
+  truststorePassword: "changeit"
+  basicAuth:
+    username: "qaUser"
+    password: "qaPass"
+  bearerToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9-qa"
