@@ -1,0 +1,66 @@
+Atue como um QE Tech Lead especialista em testes de APIs REST e Pix.
+
+Analise o arquivo/documentação que vou fornecer e crie os casos de teste da API solicitada seguindo rigorosamente as regras abaixo.
+
+🔹 ESCOPO
+- Tipo: Testes de API REST
+- Endpoint(s): [INFORMAR ENDPOINT(S)]
+- Operação: [Criar | Consultar | Listar | Alterar | Cancelar]
+- Domínio: Pix / Recorrência / Cobrança / Outro
+
+🔹 PADRÃO DE NOMENCLATURA (OBRIGATÓRIO)
+Todos os casos de teste DEVEM seguir exatamente este padrão:
+
+[nome do sistema] VERBO_HTTP PATH_DA_API - resultado esperado
+
+Exemplos:
+[PIX] POST /rec - 201 Recorrência criada com sucesso
+[PIX] GET /rec/{idRec} - 404 Recorrência não encontrada
+[PIX] GET /rec - 200 Lista de recorrências retornada vazia
+
+🔹 TIPOS DE CENÁRIOS (OBRIGATÓRIO)
+Crie casos de teste contemplando:
+- ✅ Casos felizes
+- ❌ Casos de exceção (validação de regras de negócio, erros de contrato, autorização)
+- ⚠️ Casos de borda (limites, valores mínimos/máximos, lista vazia, paginação, concorrência)
+
+🔹 ESTRUTURA DE CADA CASO DE TESTE
+Cada caso deve conter obrigatoriamente os campos:
+- Test Case Name
+- Objective
+- Precondition
+- Test Steps
+- Expected Result
+
+🔹 FORMATO DE SAÍDA (OBRIGATÓRIO)
+- Gerar a saída em CSV
+- Usar ponto e vírgula (;) como separador
+- Encoding UTF-8
+- Compatível com importação no Zephyr Scale (Jira)
+
+🔹 HEADER DO CSV
+Utilizar exatamente este cabeçalho:
+
+Test Case Name;Objective;Precondition;Test Steps;Expected Result
+
+🔹 REGRAS IMPORTANTES
+- Não utilizar listas numeradas no CSV
+- Não quebrar linhas dentro das células
+- Usar linguagem clara, objetiva e técnica
+- Os códigos HTTP devem aparecer no nome do teste e no resultado esperado
+- Considerar regras de negócio descritas no arquivo/documentação fornecida
+- Não inventar regras que não estejam explícitas ou implícitas no manual
+
+🔹 EXTRA (SE APLICÁVEL)
+Quando fizer sentido, considerar:
+- Autenticação (401 / 403)
+- Recurso inexistente (404)
+- Lista vazia
+- Paginação
+- Alta concorrência
+- Indisponibilidade do serviço (503)
+
+🔹 SAÍDA FINAL
+Entregar SOMENTE:
+- O CSV final pronto para importação no Zephyr
+- Sem explicações adicionais antes ou depois do CSV
