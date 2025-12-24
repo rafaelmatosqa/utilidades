@@ -1,0 +1,122 @@
+Atue como um QE Tech Lead especialista no ecossistema Pix (BACEN), testes de APIs REST e mensageria (pacs/XML).
+
+Analise as regras de negócio e/ou documentação que vou fornecer e crie casos de teste de API para a funcionalidade:
+👉 RECEBIMENTO DE PIX
+
+────────────────────────────────
+🔹 PADRÃO DE NOMENCLATURA (OBRIGATÓRIO)
+────────────────────────────────
+Todos os casos de teste DEVEM seguir exatamente este padrão:
+
+[nome do sistema] Recebimento de Pix - resultado esperado
+
+Exemplos:
+[SISTEMA A] Recebimento de Pix - Pix liquidado com sucesso
+[SISTEMA B] Recebimento de Pix - Pix cancelado (Conta Encerrada)
+[SISTEMA A] Recebimento de Pix - Pix liquidado com sucesso (QR Dinâmico Troco)
+
+────────────────────────────────
+🔹 DIMENSÕES DE TESTE
+────────────────────────────────
+Considere obrigatoriamente as dimensões abaixo:
+
+- Tipo de pessoa: PF, PJ
+- Tipo de conta: Corrente, Salário, Poupança
+- Status da conta:
+  - Ativa
+  - Inativa
+  - Encerrada
+  - Crise
+  - Transformada
+- Tipo de iniciação:
+  - Chave
+  - Dados Bancários
+  - QR Code Estático
+  - QR Code Estático Saque
+  - QR Code Dinâmico Imediato
+  - QR Code Dinâmico Imediato Saque
+  - Dinâmico de Troco
+  - Dinâmico com Vencimento
+  - COBR Dinâmico
+
+────────────────────────────────
+🔹 REGRAS DE NEGÓCIO (OBRIGATÓRIO)
+────────────────────────────────
+- Para contas com status:
+  - Ativa, Inativa, Crise e Transformada → Pix DEVE liquidar com sucesso
+  - Encerrada → Pix DEVE ser cancelado
+- Para conta Salário:
+  - Pix DEVE ser cancelado e NÃO liquidar, independentemente do status
+- Em iniciações de Saque e Troco:
+  - Validar gravação correta nas tabelas de SAQUE e/ou TROCO
+- Em caso de cancelamento:
+  - Não deve haver crédito, extrato ou movimentação
+  - Saldo não deve ser alterado
+
+────────────────────────────────
+🔹 STEPS PADRÃO (OBRIGATÓRIO)
+────────────────────────────────
+Nos casos de LIQUIDAÇÃO com sucesso, os passos DEVEM conter:
+- Envio do payload para o endpoint de envio à fila BACEN
+- Validação:
+  - Tabela X (registro do Pix)
+  - Tabela Y (extrato)
+  - Tabela M (movimentação)
+  - Tabela Z (mensagens pacs)
+  - Validação do XML conforme Catálogo Pix BACEN
+  - Validação de saldo atualizado
+- Para Saque/Troco:
+  - Validação adicional nas tabelas específicas
+
+Nos casos de CANCELAMENTO:
+- Validar status CANCELADO na tabela X
+- Garantir ausência de crédito em extrato e movimentação
+- Validar mensagens pacs coerentes
+- Validar saldo inalterado
+- Garantir ausência de registro de saque/troco
+
+────────────────────────────────
+🔹 ESTRATÉGIA DE COBERTURA
+────────────────────────────────
+Utilizar uma das estratégias abaixo (informar qual aplicar):
+
+- Pairwise (preferencial para regressão)
+- Cobertura total (PF/PJ × Conta × Status × Iniciação)
+
+────────────────────────────────
+🔹 SISTEMAS
+────────────────────────────────
+Gerar os casos separadamente para:
+- SISTEMA A
+- SISTEMA B
+
+────────────────────────────────
+🔹 FORMATO DE SAÍDA (OBRIGATÓRIO)
+────────────────────────────────
+- Gerar SOMENTE o CSV final
+- Separador: ponto e vírgula (;)
+- Encoding: UTF-8
+- Compatível com importação no Zephyr Scale (Jira)
+
+────────────────────────────────
+🔹 HEADER DO CSV
+────────────────────────────────
+Utilizar exatamente:
+
+Test Case Name;Objective;Precondition;Test Steps;Expected Result
+
+────────────────────────────────
+🔹 REGRAS DE QUALIDADE
+────────────────────────────────
+- Não quebrar linhas dentro das células
+- Não usar listas numeradas no CSV
+- Linguagem técnica e objetiva
+- Resultado esperado deve refletir claramente LIQUIDAÇÃO ou CANCELAMENTO
+- Não inventar regras fora do escopo informado
+
+────────────────────────────────
+🔹 SAÍDA FINAL
+────────────────────────────────
+Entregar SOMENTE:
+- O CSV pronto para importação no Zephyr
+- Sem explicações adicionais
