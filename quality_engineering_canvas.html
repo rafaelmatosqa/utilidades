@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quality Engineering Canvas</title>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --ink: #172033;
+    --muted: #5d677a;
+    --line: #d8e0ec;
+    --ba: #4f46e5;
+    --dev: #059669;
+    --qe: #d97706;
+    --shared: #0f766e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .canvas {
+    width: 1600px;
+    min-height: 1100px;
+    margin: 0 auto;
+    padding: 36px;
+  }
+  header {
+    background: linear-gradient(135deg, #111827, #1f2937);
+    color: white;
+    border-radius: 24px;
+    padding: 32px 36px;
+    display: grid;
+    grid-template-columns: 1.4fr .6fr;
+    gap: 24px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .18);
+  }
+  h1 { margin: 0 0 8px; font-size: 44px; letter-spacing: -1px; }
+  .subtitle { font-size: 20px; color: #cbd5e1; line-height: 1.35; }
+  .principle {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 18px;
+    padding: 18px;
+    font-size: 18px;
+    line-height: 1.35;
+  }
+  .grid-roles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-top: 24px;
+  }
+  .role {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
+  }
+  .role h2 { margin: 0; font-size: 28px; }
+  .tag {
+    display: inline-block;
+    margin: 10px 0 16px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .ba .tag, .ba .bar { background: var(--ba); }
+  .dev .tag, .dev .bar { background: var(--dev); }
+  .qe .tag, .qe .bar { background: var(--qe); }
+  .section-title {
+    font-weight: 800;
+    margin: 14px 0 6px;
+    color: #111827;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  ul { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.42; font-size: 16px; }
+  li { margin: 4px 0; }
+  .gate {
+    margin-top: 16px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px dashed #94a3b8;
+    padding: 14px;
+    font-size: 16px;
+    color: #334155;
+  }
+  .bar { height: 6px; border-radius: 99px; margin: 18px 0 0; }
+  .middle {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 22px;
+    margin-top: 24px;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
+  }
+  .panel h2 { margin: 0 0 16px; font-size: 28px; }
+  table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 14px; font-size: 15px; }
+  th { background: #111827; color: white; text-align: left; padding: 12px; }
+  td { border-bottom: 1px solid var(--line); padding: 12px; color: #334155; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .phase { font-weight: 800; color: #111827; }
+  .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; color: white; font-size: 12px; margin: 2px; font-weight: 700; }
+  .pill.ba { background: var(--ba); }
+  .pill.dev { background: var(--dev); }
+  .pill.qe { background: var(--qe); }
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .kpi { background: #f8fafc; border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+  .kpi h3 { margin: 0 0 8px; font-size: 18px; }
+  .footer {
+    margin-top: 24px;
+    background: #ecfeff;
+    border: 1px solid #99f6e4;
+    border-radius: 22px;
+    padding: 22px 26px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .footer strong { display: block; font-size: 20px; margin-bottom: 6px; }
+  .footer span { color: #0f172a; font-size: 16px; line-height: 1.35; }
+</style>
+</head>
+<body>
+  <main class="canvas">
+    <header>
+      <div>
+        <h1>Quality Engineering Canvas</h1>
+        <div class="subtitle">Papéis e responsabilidades de qualidade no SDLC ágil: qualidade construída por todos e habilitada pelo QE.</div>
+      </div>
+      <div class="principle"><strong>Princípio norteador</strong><br>Everyone owns quality. QE enables quality.</div>
+    </header>
+
+    <section class="grid-roles">
+      <article class="role ba">
+        <h2>Analista de Negócio</h2>
+        <span class="tag">Qualidade dos requisitos</span>
+        <div class="section-title">Missão</div>
+        <ul><li>Prevenir defeitos na origem com requisitos claros, completos e testáveis.</li></ul>
+        <div class="section-title">Responsabilidades</div>
+        <ul>
+          <li>Definir critérios de aceite.</li><li>Mapear fluxos principais, alternativos e exceções.</li><li>Identificar riscos de negócio/regulatórios.</li><li>Garantir rastreabilidade entre regra e valor.</li><li>Apoiar aceite funcional.</li>
+        </ul>
+        <div class="section-title">Indicadores</div>
+        <ul><li>Defeitos por requisito incompleto.</li><li>Histórias reabertas.</li><li>Retrabalho funcional.</li><li>Cobertura de critérios de aceite.</li></ul>
+        <div class="gate"><strong>Gate:</strong> história pronta apenas com critérios claros, riscos mapeados e dependências identificadas.</div>
+        <div class="bar"></div>
+      </article>
+
+      <article class="role dev">
+        <h2>Desenvolvedor</h2>
+        <span class="tag">Qualidade da implementação</span>
+        <div class="section-title">Missão</div>
+        <ul><li>Construir qualidade técnica desde o código, integração e operação.</li></ul>
+        <div class="section-title">Responsabilidades</div>
+        <ul>
+          <li>Criar testes unitários.</li><li>Implementar testes de contrato.</li><li>Realizar code review.</li><li>Garantir segurança e padrões técnicos.</li><li>Implementar logs, métricas e tracing.</li>
+        </ul>
+        <div class="section-title">Indicadores</div>
+        <ul><li>Cobertura unitária.</li><li>Code smells.</li><li>Vulnerabilidades.</li><li>Bugs em produção.</li><li>MTTR.</li></ul>
+        <div class="gate"><strong>Gate:</strong> merge apenas com testes aprovados, cobertura mínima, contratos válidos e sem vulnerabilidade crítica.</div>
+        <div class="bar"></div>
+      </article>
+
+      <article class="role qe">
+        <h2>Quality Engineer</h2>
+        <span class="tag">Estratégia, governança e validação</span>
+        <div class="section-title">Missão</div>
+        <ul><li>Orquestrar, habilitar e medir qualidade em todo o SDLC.</li></ul>
+        <div class="section-title">Responsabilidades</div>
+        <ul>
+          <li>Definir estratégia de testes.</li><li>Conduzir análise de risco.</li><li>Automatizar testes de API/integração/E2E.</li><li>Definir quality gates.</li><li>Monitorar métricas e risco residual.</li>
+        </ul>
+        <div class="section-title">Indicadores</div>
+        <ul><li>Defect leakage.</li><li>Escape defects.</li><li>Cobertura automatizada.</li><li>Flaky rate.</li><li>Risco residual.</li></ul>
+        <div class="gate"><strong>Gate:</strong> release apenas com regressão executada, critérios de saída atendidos e riscos aceitos.</div>
+        <div class="bar"></div>
+      </article>
+    </section>
+
+    <section class="middle">
+      <div class="panel">
+        <h2>Responsabilidade Compartilhada por Fase</h2>
+        <table>
+          <thead><tr><th>Fase do SDLC</th><th>Distribuição</th><th>Objetivo de qualidade</th></tr></thead>
+          <tbody>
+            <tr><td class="phase">Discovery</td><td><span class="pill ba">BA 60%</span><span class="pill qe">QE 30%</span><span class="pill dev">DEV 10%</span></td><td>Construir requisitos corretos e testáveis.</td></tr>
+            <tr><td class="phase">Refinamento</td><td><span class="pill ba">BA 50%</span><span class="pill qe">QE 30%</span><span class="pill dev">DEV 20%</span></td><td>Eliminar ambiguidades e mapear riscos.</td></tr>
+            <tr><td class="phase">Desenvolvimento</td><td><span class="pill dev">DEV 70%</span><span class="pill qe">QE 20%</span><span class="pill ba">BA 10%</span></td><td>Construir qualidade no código.</td></tr>
+            <tr><td class="phase">Integração</td><td><span class="pill qe">QE 50%</span><span class="pill dev">DEV 40%</span><span class="pill ba">BA 10%</span></td><td>Validar comportamento sistêmico.</td></tr>
+            <tr><td class="phase">Homologação</td><td><span class="pill qe">QE 60%</span><span class="pill ba">BA 20%</span><span class="pill dev">DEV 20%</span></td><td>Validar aderência ao negócio.</td></tr>
+            <tr><td class="phase">Produção</td><td><span class="pill qe">QE 40%</span><span class="pill dev">DEV 40%</span><span class="pill ba">BA 20%</span></td><td>Garantir confiabilidade e melhoria contínua.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h2>KPIs Organizacionais</h2>
+        <div class="kpi-grid">
+          <div class="kpi"><h3>Negócio</h3><ul><li>Histórias reabertas</li><li>Defeitos funcionais</li><li>Retrabalho de regra</li></ul></div>
+          <div class="kpi"><h3>Engenharia</h3><ul><li>Cobertura unitária</li><li>Code smells</li><li>Vulnerabilidades</li></ul></div>
+          <div class="kpi"><h3>QE</h3><ul><li>Escape defects</li><li>Defect leakage</li><li>Risco residual</li></ul></div>
+        </div>
+        <h2 style="margin-top:22px">Quality Gates</h2>
+        <table>
+          <thead><tr><th>Gate</th><th>Critério mínimo</th></tr></thead>
+          <tbody>
+            <tr><td class="phase">Ready</td><td>Critérios de aceite, fluxos, riscos e dependências definidos.</td></tr>
+            <tr><td class="phase">Merge</td><td>Testes unitários, contrato, análise estática e segurança aprovados.</td></tr>
+            <tr><td class="phase">Release</td><td>Regressão, evidências, riscos aceitos e critérios de saída atendidos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="footer">
+      <div><strong>BA</strong><span>Garante que o produto certo seja especificado com clareza e valor de negócio.</span></div>
+      <div><strong>DEV</strong><span>Garante que a solução seja implementada com qualidade técnica, segurança e observabilidade.</span></div>
+      <div><strong>QE</strong><span>Garante estratégia, governança, validação, métricas e melhoria contínua da qualidade.</span></div>
+    </section>
+  </main>
+</body>
+</html>
