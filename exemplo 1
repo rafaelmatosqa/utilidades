@@ -1,0 +1,32 @@
+
+Feature: Contestação Pix - PSP vítima
+
+  Scenario: Concluir contestação após aceite da infração e devolução integral
+
+    Given que existe um Pix efetivado e elegível para contestação
+    And que a transação possui identificadores para correlação E2E
+    And que o PSP recebedor está apto a realizar a devolução integral
+
+    When o cliente registra a contestação do Pix
+    Then a contestação deve ser persistida com status "CRIADA"
+    And a contestação deve estar vinculada ao Pix original
+    And a RV deve ser criada com status "PENDENTE"
+    And a RV deve estar vinculada à contestação
+    And a notificação de infração deve ser registrada
+    And a infração deve possuir status "AGUARDANDO_ANALISE"
+
+    When o PSP recebedor aceita a notificação de infração via Bacen
+    And o PSP vítima processa o resultado da análise
+    Then a infração deve possuir status "CONCLUIDA"
+    And uma solicitação de devolução deve ser criada
+    And a solicitação deve possuir status "ABERTA"
+    And a solicitação deve corresponder ao Pix contestado
+
+    When o PSP recebedor aceita a solicitação de devolução
+    And a devolução integral do Pix é efetivada
+    And o PSP vítima processa a confirmação da devolução
+    Then o valor integral devolvido deve ser confirmado
+    And a solicitação de devolução deve possuir status "FECHADA"
+    And a RV deve possuir status "CONCLUIDA"
+    And a contestação deve possuir status "CONCLUIDA"
+    And todas as entidades devem preservar a correlação E2E
