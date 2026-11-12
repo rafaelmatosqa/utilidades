@@ -1,0 +1,499 @@
+Cancelamento manual
+
+CT01 — [componente] Cancelamento de contestação criada - deve permitir cancelamento sem RV e notificação
+
+Objetivo: Validar cancelamento da contestação criada antes da geração de RV e notificação.
+
+Pré-condição: Contestação criada, sem RV, notificação ou solicitação de devolução.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação criada - deve permitir cancelamento sem RV e notificação
+  Given que a contestação esteja criada e não existam RV, notificação ou devolução
+  When o cancelamento manual da contestação for solicitado
+  Then a contestação deve ser cancelada e a timeline não deve apresentar RV nem notificação inexistentes
+
+CT02 — [componente] Cancelamento de contestação enviada - deve permitir cancelamento com infração aguardando análise e sem devolução
+
+Objetivo: Validar cancelamento enquanto a infração aguarda análise.
+
+Pré-condição: Contestação enviada, com RV e notificação de infração aguardando análise, sem devolução.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação enviada - deve permitir cancelamento com infração aguardando análise e sem devolução
+  Given que a contestação esteja enviada, com RV e infração aguardando análise e sem devolução
+  When o cancelamento manual for solicitado
+  Then o cancelamento deve ser permitido e refletido no histórico
+
+CT03 — [componente] Cancelamento de contestação com infração aceita - deve permitir cancelamento com solicitação de devolução aberta
+
+Objetivo: Validar cancelamento antes de iniciar o processamento da devolução.
+
+Pré-condição: Análise concluída, infração aceita e solicitação de devolução aberta.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação com infração aceita - deve permitir cancelamento com solicitação de devolução aberta
+  Given que a infração esteja aceita e a solicitação de devolução esteja aberta
+  When o cancelamento manual for solicitado
+  Then a contestação deve ser cancelada e a timeline deve refletir o evento
+
+CT04 — [componente] Cancelamento de contestação com infração aceita - não deve permitir cancelamento com devolução em processamento
+
+Objetivo: Validar bloqueio enquanto a devolução está em processamento.
+
+Pré-condição: Análise concluída, infração aceita e devolução em processamento.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação com infração aceita - não deve permitir cancelamento com devolução em processamento
+  Given que a infração esteja aceita e a devolução esteja em processamento
+  When o cancelamento manual for solicitado
+  Then o cancelamento deve ser bloqueado e o status da contestação deve ser preservado
+
+CT05 — [componente] Cancelamento de contestação com infração aceita - deve permitir cancelamento com devolução não efetivada por falta de saldo
+
+Objetivo: Validar cancelamento após devolução não efetivada por falta de saldo.
+
+Pré-condição: Infração aceita e tentativa de devolução não efetivada por falta de saldo.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação com infração aceita - deve permitir cancelamento com devolução não efetivada por falta de saldo
+  Given que a devolução não tenha sido efetivada por falta de saldo
+  When o cancelamento manual for solicitado
+  Then o cancelamento deve ser permitido e a falha por falta de saldo deve continuar rastreável
+
+CT06 — [componente] Cancelamento de contestação com infração aceita - deve permitir cancelamento com falha no processamento da devolução
+
+Objetivo: Validar cancelamento após falha na devolução.
+
+Pré-condição: Infração aceita e devolução não efetivada por falha de processamento.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação com infração aceita - deve permitir cancelamento com falha no processamento da devolução
+  Given que a devolução tenha falhado no processamento sem efetivação
+  When o cancelamento manual for solicitado
+  Then o cancelamento deve ser permitido e a falha deve permanecer no histórico
+
+CT07 — [componente] Cancelamento de contestação com infração rejeitada - deve permitir cancelamento sem solicitação de devolução
+
+Objetivo: Validar cancelamento de contestação com análise rejeitada.
+
+Pré-condição: Análise concluída, infração rejeitada e sem solicitação de devolução.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação com infração rejeitada - deve permitir cancelamento sem solicitação de devolução
+  Given que a infração esteja rejeitada e não exista devolução
+  When o cancelamento manual for solicitado
+  Then a contestação deve ser cancelada sem criar uma solicitação de devolução
+
+CT08 — [componente] Cancelamento de contestação com devolução totalmente efetivada - não deve permitir cancelamento
+
+Objetivo: Validar bloqueio quando o valor integral já foi devolvido.
+
+Pré-condição: Contestação com devolução integral efetivada.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação com devolução totalmente efetivada - não deve permitir cancelamento
+  Given que a devolução total esteja efetivada
+  When o cancelamento manual for solicitado
+  Then o cancelamento deve ser bloqueado e os registros devem permanecer inalterados
+
+CT09 — [componente] Cancelamento de contestação com devolução parcialmente efetivada - não deve permitir cancelamento
+
+Objetivo: Validar bloqueio quando parte do valor já foi devolvida.
+
+Pré-condição: Contestação com devolução parcial efetivada.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação com devolução parcialmente efetivada - não deve permitir cancelamento
+  Given que a devolução parcial esteja efetivada
+  When o cancelamento manual for solicitado
+  Then o cancelamento deve ser bloqueado e os registros devem permanecer inalterados
+
+CT10 — [componente] Cancelamento de contestação já cancelada - não deve gerar cancelamento duplicado
+
+Objetivo: Validar idempotência de nova solicitação de cancelamento.
+
+Pré-condição: Contestação já cancelada e evento registrado no histórico.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação já cancelada - não deve gerar cancelamento duplicado
+  Given que a contestação já esteja cancelada
+  When uma nova solicitação de cancelamento for realizada
+  Then não deve ser gerado outro evento de cancelamento efetivado
+
+CT11 — [componente] Cancelamento de contestação durante efetivação da devolução - deve manter consistência dos status
+
+Objetivo: Validar tratamento de concorrência entre cancelamento e devolução.
+
+Pré-condição: Contestação elegível ao cancelamento e processamento de devolução concorrente.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento de contestação durante efetivação da devolução - deve manter consistência dos status
+  Given que o cancelamento e a efetivação da devolução disputem a mesma contestação
+  When as duas operações forem processadas concorrentemente
+  Then o estado final deve respeitar a regra de bloqueio e não apresentar cancelamento incompatível com devolução efetivada
+
+Histórico da timeline
+
+CT12 — [componente] Histórico de cancelamento de contestação criada - deve apresentar cancelamento sem RV e notificação
+
+Objetivo: Validar exibição da timeline de contestação cancelada ainda na criação.
+
+Pré-condição: Contestação criada e cancelada antes da geração de RV e notificação.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação criada - deve apresentar cancelamento sem RV e notificação
+  Given que uma contestação criada tenha sido cancelada sem RV e notificação
+  When a timeline da contestação for consultada
+  Then o cancelamento deve aparecer e as etapas inexistentes não devem ser exibidas como realizadas
+
+CT13 — [componente] Histórico de cancelamento de contestação enviada - deve apresentar cancelamento com infração aguardando análise
+
+Objetivo: Validar histórico do cancelamento durante análise pendente.
+
+Pré-condição: Contestação enviada, RV e infração aguardando análise, posteriormente cancelada.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação enviada - deve apresentar cancelamento com infração aguardando análise
+  Given que a contestação enviada tenha sido cancelada com infração aguardando análise
+  When a timeline for consultada
+  Then o cancelamento e os eventos anteriores devem estar representados corretamente
+
+CT14 — [componente] Histórico de cancelamento de contestação com infração aceita - deve apresentar cancelamento com solicitação de devolução aberta
+
+Objetivo: Validar timeline de cancelamento com devolução aberta.
+
+Pré-condição: Infração aceita, solicitação de devolução aberta e contestação cancelada.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação com infração aceita - deve apresentar cancelamento com solicitação de devolução aberta
+  Given que a contestação tenha sido cancelada com solicitação de devolução aberta
+  When a timeline for consultada
+  Then o evento de cancelamento e o estado da solicitação devem estar coerentes
+
+CT15 — [componente] Histórico de cancelamento de contestação com devolução não efetivada por falta de saldo - deve preservar resultado da devolução
+
+Objetivo: Validar rastreabilidade da falta de saldo após cancelamento.
+
+Pré-condição: Devolução não efetivada por falta de saldo e cancelamento realizado.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação com devolução não efetivada por falta de saldo - deve preservar resultado da devolução
+  Given que a devolução tenha falhado por falta de saldo antes do cancelamento
+  When a timeline for consultada
+  Then o histórico deve conservar o resultado de falta de saldo e o cancelamento posterior
+
+CT16 — [componente] Histórico de cancelamento de contestação com falha no processamento da devolução - deve preservar registro da falha
+
+Objetivo: Validar rastreabilidade da falha após cancelamento.
+
+Pré-condição: Devolução com falha de processamento e contestação cancelada.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação com falha no processamento da devolução - deve preservar registro da falha
+  Given que uma falha no processamento da devolução tenha antecedido o cancelamento
+  When a timeline for consultada
+  Then o evento de falha e o cancelamento devem continuar identificáveis
+
+CT17 — [componente] Histórico de cancelamento de contestação com infração rejeitada - deve apresentar cancelamento sem solicitação de devolução
+
+Objetivo: Validar histórico sem devolução após rejeição.
+
+Pré-condição: Infração rejeitada, sem devolução, contestação cancelada.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação com infração rejeitada - deve apresentar cancelamento sem solicitação de devolução
+  Given que a infração rejeitada tenha sido seguida de cancelamento sem devolução
+  When a timeline for consultada
+  Then o cancelamento deve ser apresentado sem inventar uma devolução
+
+CT18 — [componente] Histórico de cancelamento de contestação com devolução em processamento - não deve apresentar cancelamento efetivado
+
+Objetivo: Validar timeline após bloqueio de cancelamento.
+
+Pré-condição: Devolução em processamento e tentativa de cancelamento bloqueada.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação com devolução em processamento - não deve apresentar cancelamento efetivado
+  Given que a devolução esteja em processamento e a tentativa de cancelamento tenha sido bloqueada
+  When a timeline for consultada
+  Then não deve existir evento de cancelamento efetivado
+
+CT19 — [componente] Histórico de cancelamento de contestação com devolução totalmente efetivada - deve preservar os status originais
+
+Objetivo: Validar histórico após tentativa bloqueada por devolução integral.
+
+Pré-condição: Devolução integral efetivada e cancelamento manual bloqueado.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação com devolução totalmente efetivada - deve preservar os status originais
+  Given que a devolução integral esteja efetivada e o cancelamento tenha sido bloqueado
+  When a timeline for consultada
+  Then os estados originais devem estar preservados sem cancelamento efetivado
+
+CT20 — [componente] Histórico de cancelamento de contestação com devolução parcialmente efetivada - deve preservar os status originais
+
+Objetivo: Validar histórico após tentativa bloqueada por devolução parcial.
+
+Pré-condição: Devolução parcial efetivada e cancelamento manual bloqueado.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação com devolução parcialmente efetivada - deve preservar os status originais
+  Given que a devolução parcial esteja efetivada e o cancelamento tenha sido bloqueado
+  When a timeline for consultada
+  Then os estados originais devem estar preservados sem cancelamento efetivado
+
+CT21 — [componente] Histórico de cancelamento de contestação - deve apresentar os eventos em ordem cronológica
+
+Objetivo: Validar ordenação temporal dos eventos.
+
+Pré-condição: Contestação com múltiplos eventos e cancelamento registrado.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação - deve apresentar os eventos em ordem cronológica
+  Given que existam eventos de contestação, RV, notificação e devolução com horários conhecidos
+  When a timeline for consultada
+  Then os eventos devem seguir a ordenação temporal definida no contrato
+
+CT22 — [componente] Histórico de cancelamento de contestação - deve preservar os status anteriores das etapas
+
+Objetivo: Validar integridade histórica após cancelamento.
+
+Pré-condição: Contestação com transições de status registradas antes do cancelamento.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação - deve preservar os status anteriores das etapas
+  Given que existam transições anteriores de RV, infração e devolução
+  When a contestação for cancelada e a timeline consultada
+  Then os eventos históricos anteriores devem permanecer rastreáveis
+
+CT23 — [componente] Histórico de cancelamento de contestação - deve apresentar data e hora do cancelamento
+
+Objetivo: Validar informações temporais do cancelamento.
+
+Pré-condição: Contestação cancelada com data e hora persistidas.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação - deve apresentar data e hora do cancelamento
+  Given que o cancelamento tenha sido concluído e possua data e hora registradas
+  When a timeline for consultada
+  Then o evento deve apresentar data e hora compatíveis com o registro persistido
+
+CT24 — [componente] Histórico de cancelamento de contestação - deve apresentar somente as etapas existentes no fluxo
+
+Objetivo: Validar ausência de etapas inexistentes.
+
+Pré-condição: Contestação sem todas as etapas criadas.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação - deve apresentar somente as etapas existentes no fluxo
+  Given que a contestação não tenha gerado uma ou mais etapas da timeline
+  When a timeline for consultada
+  Then etapas inexistentes não devem ser apresentadas como eventos realizados
+
+CT25 — [componente] Histórico de cancelamento de contestação - não deve apresentar eventos duplicados
+
+Objetivo: Validar unicidade dos eventos exibidos.
+
+Pré-condição: Contestação com histórico registrado e consultas repetidas.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação - não deve apresentar eventos duplicados
+  Given que o histórico da contestação esteja disponível
+  When a timeline for consultada repetidamente
+  Then não devem surgir eventos duplicados entre as consultas
+
+CT26 — [componente] Histórico de cancelamento de contestação - deve manter consistência dos eventos após atualização dos status
+
+Objetivo: Validar coerência da timeline após mudanças de estado.
+
+Pré-condição: Contestação com múltiplas transições persistidas.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento de contestação - deve manter consistência dos eventos após atualização dos status
+  Given que as etapas tenham sofrido atualizações de status
+  When a timeline for consultada após a atualização
+  Then os status atuais e os eventos anteriores devem permanecer coerentes
+
+Cancelamento automático após estorno
+
+CT27 — [componente] Cancelamento automático após estorno efetivado - deve cancelar contestação, RV e infração originais e manter devolução fechada
+
+Objetivo: Validar a reversão automática dos registros originais após estorno efetivado.
+
+Pré-condição: Contestação original concluída com devolução recebida; outra IF contestou a devolução; instituição recebedora aceitou e estornou o valor.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento automático após estorno efetivado - deve cancelar contestação, RV e infração originais e manter devolução fechada
+  Given que a contestação original esteja concluída, com RV, infração e devolução original fechada
+  When o instituição recebedora aceitar a contestação da devolução e o estorno for efetivado
+  Then a contestação, RV e infração originais devem ser canceladas automaticamente e a devolução original deve permanecer fechada
+
+CT28 — [componente] Histórico de cancelamento automático após estorno - deve apresentar status atualizados dos registros originais
+
+Objetivo: Validar apresentação da reversão na timeline.
+
+Pré-condição: Estorno efetivado e cancelamento automático dos registros originais concluído.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento automático após estorno - deve apresentar status atualizados dos registros originais
+  Given que o estorno tenha sido efetivado e o cancelamento automático processado
+  When a timeline original for consultada
+  Then contestação, RV e infração devem aparecer canceladas e a devolução original deve permanecer fechada
+
+CT29 — [componente] Cancelamento automático após estorno - deve manter solicitação de devolução original fechada
+
+Objetivo: Validar preservação do estado fechado da solicitação original.
+
+Pré-condição: Devolução original fechada e estorno efetivado.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento automático após estorno - deve manter solicitação de devolução original fechada
+  Given que a devolução original esteja fechada e o estorno tenha sido efetivado
+  When o cancelamento automático dos registros originais ocorrer
+  Then a solicitação de devolução original deve continuar fechada
+
+CT30 — [componente] Cancelamento automático após contestação da devolução - não deve cancelar registros originais antes da efetivação do estorno
+
+Objetivo: Validar que aceite isolado não aciona cancelamento antecipado.
+
+Pré-condição: Contestação da devolução aceita, com estorno ainda não efetivado.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento automático após contestação da devolução - não deve cancelar registros originais antes da efetivação do estorno
+  Given que o instituição recebedora tenha aceitado a contestação da devolução, sem efetivar o estorno
+  When o processamento automático verificar a elegibilidade para cancelamento
+  Then a contestação, RV e infração originais não devem ser canceladas antes da efetivação
+
+CT31 — [componente] Cancelamento automático após estorno - não deve gerar eventos duplicados durante reprocessamento
+
+Objetivo: Validar idempotência do processamento automático.
+
+Pré-condição: Estorno efetivado e cancelamento automático já executado.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento automático após estorno - não deve gerar eventos duplicados durante reprocessamento
+  Given que o cancelamento automático já tenha sido registrado após estorno
+  When o mesmo evento de estorno for reprocessado
+  Then não devem ser gerados cancelamentos efetivados duplicados
+
+CT32 — [componente] Cancelamento automático após falha no estorno - deve preservar status originais até efetivação
+
+Objetivo: Validar integridade antes de estorno bem-sucedido.
+
+Pré-condição: Contestação da devolução aceita e estorno não efetivado.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento automático após falha no estorno - deve preservar status originais até efetivação
+  Given que o estorno ainda não tenha sido efetivado
+  When o fluxo automático avaliar os registros originais
+  Then os registros originais devem manter seus status anteriores
+
+CT33 — [componente] Cancelamento automático após falta de saldo no estorno - não deve cancelar registros originais
+
+Objetivo: Validar tratamento de insuficiência de saldo.
+
+Pré-condição: Contestação da devolução aceita e estorno recusado por falta de saldo.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento automático após falta de saldo no estorno - não deve cancelar registros originais
+  Given que o instituição recebedora tenha aceitado a contestação da devolução
+  When a tentativa de estorno não for efetivada por falta de saldo
+  Then contestação, RV e infração originais devem manter seus status e a devolução original deve permanecer fechada
+
+CT34 — [componente] Cancelamento automático após falha no processamento do estorno - não deve cancelar registros originais
+
+Objetivo: Validar tratamento de erro de processamento.
+
+Pré-condição: Contestação da devolução aceita e estorno não efetivado por erro.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento automático após falha no processamento do estorno - não deve cancelar registros originais
+  Given que o instituição recebedora tenha aceitado a contestação da devolução
+  When o processamento do estorno falhar sem efetivação
+  Then contestação, RV e infração originais devem manter seus status e a devolução original deve permanecer fechada
+
+CT35 — [componente] Cancelamento automático após regularização de saldo - deve cancelar registros originais após estorno efetivado
+
+Objetivo: Validar recuperação de estorno após falta de saldo, quando houver retentativa.
+
+Pré-condição: Primeiro estorno não efetivado por falta de saldo; saldo regularizado e retentativa prevista.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento automático após regularização de saldo - deve cancelar registros originais após estorno efetivado
+  Given que o estorno anterior tenha falhado por falta de saldo e a retentativa seja suportada
+  When uma nova tentativa de estorno for efetivada
+  Then contestação, RV e infração originais devem ser canceladas e a devolução original deve continuar fechada
+
+CT36 — [componente] Cancelamento automático após reprocessamento de falha - deve cancelar registros originais após efetivação
+
+Objetivo: Validar recuperação de falha técnica, quando houver reprocessamento.
+
+Pré-condição: Falha técnica anterior; mecanismo de reprocessamento disponível.
+
+Test Script (Gherkin):
+
+Scenario: Cancelamento automático após reprocessamento de falha - deve cancelar registros originais após efetivação
+  Given que o estorno anterior tenha falhado e exista reprocessamento autorizado
+  When o reprocessamento efetivar o estorno
+  Then contestação, RV e infração originais devem ser canceladas sem duplicidade
+
+CT37 — [componente] Histórico de cancelamento automático - deve registrar falta de saldo no estorno sem cancelamento efetivado
+
+Objetivo: Validar histórico da tentativa de estorno não efetivada por saldo.
+
+Pré-condição: Estorno não efetivado por falta de saldo e evento de falha disponível para histórico.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento automático - deve registrar falta de saldo no estorno sem cancelamento efetivado
+  Given que o estorno tenha falhado por falta de saldo
+  When o histórico do fluxo for consultado
+  Then a falta de saldo deve ser rastreável sem indicar cancelamento automático efetivado
+
+CT38 — [componente] Histórico de cancelamento automático - deve registrar falha de processamento no estorno sem cancelamento efetivado
+
+Objetivo: Validar histórico da falha técnica de estorno.
+
+Pré-condição: Estorno não efetivado por falha técnica e evento de falha disponível para histórico.
+
+Test Script (Gherkin):
+
+Scenario: Histórico de cancelamento automático - deve registrar falha de processamento no estorno sem cancelamento efetivado
+  Given que o estorno tenha falhado no processamento
+  When o histórico do fluxo for consultado
+  Then a falha deve ser rastreável sem indicar cancelamento automático efetivado
