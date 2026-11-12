@@ -1,0 +1,94 @@
+Cenários de teste — Cancelamento de contestação Pix
+
+Consolidação de 38 cenários de teste para cancelamento manual, acompanhamento do histórico na timeline e cancelamento automático após contestação da devolução.
+
+> **Observação:** `[componente]` deve ser substituído pelo identificador real do componente. Cenários complementares e comportamentos ainda não confirmados devem ser validados com a regra de negócio.
+
+1. Lista de cenários
+
+Cancelamento manual — CT01 a CT11
+
+1. CT01 — [componente] Cancelamento de contestação criada - deve permitir cancelamento sem RV e notificação.
+2. CT02 — [componente] Cancelamento de contestação enviada - deve permitir cancelamento com infração aguardando análise e sem devolução.
+3. CT03 — [componente] Cancelamento de contestação com infração aceita - deve permitir cancelamento com solicitação de devolução aberta.
+4. CT04 — [componente] Cancelamento de contestação com infração aceita - não deve permitir cancelamento com devolução em processamento.
+5. CT05 — [componente] Cancelamento de contestação com infração aceita - deve permitir cancelamento com devolução não efetivada por falta de saldo.
+6. CT06 — [componente] Cancelamento de contestação com infração aceita - deve permitir cancelamento com falha no processamento da devolução.
+7. CT07 — [componente] Cancelamento de contestação com infração rejeitada - deve permitir cancelamento sem solicitação de devolução.
+8. CT08 — [componente] Cancelamento de contestação com devolução totalmente efetivada - não deve permitir cancelamento.
+9. CT09 — [componente] Cancelamento de contestação com devolução parcialmente efetivada - não deve permitir cancelamento.
+10. CT10 — [componente] Cancelamento de contestação já cancelada - não deve gerar cancelamento duplicado.
+11. CT11 — [componente] Cancelamento de contestação durante efetivação da devolução - deve manter consistência dos status.
+
+Histórico da timeline — CT12 a CT26
+
+12. CT12 — [componente] Histórico de cancelamento de contestação criada - deve apresentar cancelamento sem RV e notificação.
+13. CT13 — [componente] Histórico de cancelamento de contestação enviada - deve apresentar cancelamento com infração aguardando análise.
+14. CT14 — [componente] Histórico de cancelamento de contestação com infração aceita - deve apresentar cancelamento com solicitação de devolução aberta.
+15. CT15 — [componente] Histórico de cancelamento de contestação com devolução não efetivada por falta de saldo - deve apresentar cancelamento e preservar o resultado da devolução.
+16. CT16 — [componente] Histórico de cancelamento de contestação com falha no processamento da devolução - deve apresentar cancelamento e preservar o registro da falha.
+17. CT17 — [componente] Histórico de cancelamento de contestação com infração rejeitada - deve apresentar cancelamento sem solicitação de devolução.
+18. CT18 — [componente] Histórico de cancelamento de contestação com devolução em processamento - não deve apresentar cancelamento efetivado.
+19. CT19 — [componente] Histórico de cancelamento de contestação com devolução totalmente efetivada - deve preservar os status originais.
+20. CT20 — [componente] Histórico de cancelamento de contestação com devolução parcialmente efetivada - deve preservar os status originais.
+21. CT21 — [componente] Histórico de cancelamento de contestação - deve apresentar os eventos em ordem cronológica.
+22. CT22 — [componente] Histórico de cancelamento de contestação - deve preservar os status anteriores das etapas.
+23. CT23 — [componente] Histórico de cancelamento de contestação - deve apresentar data e hora do cancelamento.
+24. CT24 — [componente] Histórico de cancelamento de contestação - deve apresentar somente as etapas existentes no fluxo.
+25. CT25 — [componente] Histórico de cancelamento de contestação - não deve apresentar eventos duplicados.
+26. CT26 — [componente] Histórico de cancelamento de contestação - deve manter a consistência dos eventos após atualização dos status.
+
+Cancelamento automático após estorno — CT27 a CT38
+
+27. CT27 — [componente] Cancelamento automático de contestação após estorno efetivado - deve cancelar contestação, RV e infração originais e manter solicitação de devolução fechada.
+28. CT28 — [componente] Histórico de cancelamento automático após estorno - deve apresentar os status atualizados da contestação, RV e infração originais.
+29. CT29 — [componente] Cancelamento automático após estorno - deve manter a solicitação de devolução original fechada.
+30. CT30 — [componente] Cancelamento automático após contestação da devolução - não deve cancelar registros originais antes da efetivação do estorno.
+31. CT31 — [componente] Cancelamento automático após estorno - não deve gerar eventos duplicados durante reprocessamento.
+32. CT32 — [componente] Cancelamento automático após falha no estorno - deve preservar os status originais enquanto o estorno não for efetivado.
+33. CT33 — [componente] Cancelamento automático após contestação da devolução - não deve cancelar registros originais quando o estorno não for efetivado por falta de saldo.
+34. CT34 — [componente] Cancelamento automático após contestação da devolução - não deve cancelar registros originais quando ocorrer falha no processamento do estorno.
+35. CT35 — [componente] Cancelamento automático após regularização de saldo - deve cancelar registros originais quando o estorno for efetivado em nova tentativa.
+36. CT36 — [componente] Cancelamento automático após reprocessamento de falha - deve cancelar registros originais após efetivação do estorno.
+37. CT37 — [componente] Histórico de cancelamento automático - deve registrar falta de saldo no estorno sem apresentar cancelamento efetivado.
+38. CT38 — [componente] Histórico de cancelamento automático - deve registrar falha no processamento do estorno sem apresentar cancelamento efetivado.
+
+2. Tabelas de resultados esperados
+
+Cancelamento manual
+
+|CT  |Situação                                   |Resultado esperado |
+|----|-------------------------------------------|-------------------|
+|CT01|Contestação criada                         |Permitir           |
+|CT02|Enviada, infração aguardando análise       |Permitir           |
+|CT03|Infração aceita, devolução aberta          |Permitir           |
+|CT04|Infração aceita, devolução em processamento|Bloquear           |
+|CT05|Devolução não efetivada por falta de saldo |Permitir           |
+|CT06|Falha no processamento da devolução        |Permitir           |
+|CT07|Infração rejeitada, sem devolução          |Permitir           |
+|CT08|Devolução totalmente efetivada             |Bloquear           |
+|CT09|Devolução parcialmente efetivada           |Bloquear           |
+|CT10|Contestação já cancelada                   |Não duplicar       |
+|CT11|Cancelamento concorrente com devolução     |Manter consistência|
+
+Cancelamento automático — status da timeline original
+
+|Situação do estorno     |Contestação  |RV           |Infração     |Solicitação de devolução|
+|------------------------|-------------|-------------|-------------|------------------------|
+|Efetivado               |Cancelada    |Cancelada    |Cancelada    |Fechada                 |
+|Falta de saldo          |Mantém status|Mantém status|Mantém status|Fechada                 |
+|Falha no processamento  |Mantém status|Mantém status|Mantém status|Fechada                 |
+|Reprocessado com sucesso|Cancelada    |Cancelada    |Cancelada    |Fechada                 |
+
+> **Regra pendente de confirmação:** para falta de saldo e falha no estorno, a tabela assume que o cancelamento automático somente ocorre após a efetivação do estorno. Reprocessamentos pressupõem política de retentativa.
+
+3. Resumo da cobertura
+
+|Grupo                               |Quantidade|
+|------------------------------------|---------:|
+|Cancelamento manual                 |11        |
+|Histórico da timeline               |15        |
+|Cancelamento automático após estorno|12        |
+|**Total**                           |**38**    |
+
+Pontos de atenção: confirmar as regras de concorrência, idempotência, retentativa, registro de tentativas rejeitadas e preservação dos status em falhas de estorno.
